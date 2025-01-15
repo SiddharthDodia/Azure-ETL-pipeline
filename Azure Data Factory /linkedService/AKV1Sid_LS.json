@@ -1,0 +1,11 @@
+{
+	"name": "AKV1Sid_LS",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://AKV1Sid.vault.azure.net/"
+		}
+	}
+}

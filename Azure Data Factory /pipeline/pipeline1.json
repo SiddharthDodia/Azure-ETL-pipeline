@@ -1,0 +1,110 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Bronze Notebook",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/siddharthdodia24@gmail.com/Bronze Notebook",
+					"baseParameters": {
+						"start_date": {
+							"value": "@formatDateTime(addDays(utcNow(), -1), 'yyyy-MM-dd')",
+							"type": "Expression"
+						},
+						"end_date": {
+							"value": "@formatDateTime(utcNow(), 'yyyy-MM-dd')",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Silver Notebook",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Bronze Notebook",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/siddharthdodia24@gmail.com/SIlver Notebook",
+					"baseParameters": {
+						"bronze_params": {
+							"value": "@string(activity('Bronze Notebook').output.runOutput)",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Gold Notebook",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Silver Notebook",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/siddharthdodia24@gmail.com/Gold Notebook",
+					"baseParameters": {
+						"bronze_params": {
+							"value": "@string(activity('Bronze Notebook').output.runOutput)",
+							"type": "Expression"
+						},
+						"silver_params": {
+							"value": "@string(activity('Silver Notebook').output.runOutput)",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-01-15T04:27:26Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
